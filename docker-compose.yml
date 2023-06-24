@@ -1,99 +1,44 @@
-version: '2'
-
 services:
-  klipper:
-    image: dimalo/klipper-moonraker
+  klipper-moonraker:
+    image: melarok/klippmoonfluidd
+    container_name: klipper-moonraker
     build:
-      dockerfile: ./klipper/Dockerfile
-      context: .
-    # if klipper cannot connect to the printer check permissions on rpi then add the group here
-    # group_add:
-    #   - "996"
-    #   - "998"
+      dockerfile: ./build/klipper/Dockerfile
+      context: ../
     cap_add:
       - SYS_NICE
-    container_name: klipper
     ports:
-      - 7125:7125
-    restart: unless-stopped
+      #- <ip_of_your_raspi_here>:7125:7125
+      - 192.168.0.4:7125:7125
     volumes:
-      - gcode_files:/home/klippy/gcode_files
-      # be aware to create your own branch if you mount the config folder as it will be updated on the main branch
-      # that way you can merge upstream changes to your customized configs
-      - ./config:/home/klippy/.config
-      - moonraker_data:/home/klippy/.moonraker_database
-      # - <<your_config_path>>:/home/klippy/.config
-      # - ./printer.cfg:/home/klippy/.config/printer.cfg
-    # mount serial device - take care to grant sufficient permissions to the device: <host_dev>:<container_dev>
-    # put <container_dev> into your printer.cfg
+      - ./data:/home/klippy/printer_data
     devices:
-      - /dev/ttyUSB0:/dev/ttyUSB0
-
-  ##################################################################
-  # Example config for a second printer on a different serial port
-  ##################################################################
-
-  # klipper_another_printer:
-  #   image: dimalo/klipper-moonraker
-  #   build:
-  #     dockerfile: ./klipper/Dockerfile
-  #     context: .
-  #     # args:
-  #     #   DEVICE_GROUP: device
-  #     #   DEVICE_GID: 987
-  #   container_name: klipper_another_printer
-  #   ports:
-  #     # As 7125 is already used by the first printer, we map this moonraker's port to 7126 on the host
-  #     - 7126:7125
-  #   restart: unless-stopped
-  #   volumes:
-  #     # Let both klipper instances use the same storage for gcode files
-  #     - gcode_files:/home/klippy/gcode_files
-  #     # be aware to create your own branch if you mount the config folder as it will be updated on the main branch
-  #     # that way you can merge upstream changes to your (developed) configs...
-  #     - ./config_another_printer:/home/klippy/.config
-  #     # - <<your_config_path>>:/home/klippy/.config
-  #     # - ./another_printer.cfg:/home/klippy/.config/printer.cfg
-  #   # mount serial device - take care to grant sufficient permissions to the device: <host_dev>:<container_dev>
-  #   # put <container_dev> into your printer.cfg
-  #   devices:
-  #     - /dev/ttyACM0:/dev/ttyACM0
+      #- /dev/serial/by-id/<usb_id_of_your_printer_here>:/dev/printer
+      - /dev/serial/by-id/usb-Klipper_lpc1768_1C400119018139AFC072075CC12000F5-if00:/dev/printer
+    restart: unless-stopped
 
 
   fluidd:
-    image: dimalo/fluidd
-    # build:
-    #   dockerfile: Dockerfile
-    #   context: frontend
-    restart: unless-stopped
+    image: cadriel/fluidd:latest
     container_name: fluidd
-    ports:
-      - 8010:80
-    depends_on: 
-      - klipper
-      # - klipper_another_printer
-    links:
-      - klipper:klipper
-      # - klipper_another_printer:klipper_another_printer
+    hostname: fluidd
+    depends_on:
+      - klipper-moonraker
+    environment:
+      #TZ: "<your_timezone_here>"
+      TZ: "Europe/Berlin"
+    #ports:
+    # - 8080:80
+    networks:
+      - traefik
+    labels:
+      #- "traefik.http.routers.fluidd.entrypoints=<your_http_entrypoint_here>"
+      #- "traefik.http.routers.fluidd.rule=Host(`<your_subdomain.domain.tld_here>`)"
+      - "traefik.enable=true"
+      - "traefik.http.routers.fluidd.entrypoints=web"
+      - "traefik.http.routers.fluidd.rule=Host(`print.pi`)"
+    restart: unless-stopped
 
-  # mainsail:
-  #   image: dimalo/mainsail
-  #   build:
-  #     dockerfile: Dockerfile
-  #     context: frontend
-  #     args:
-  #       FRONTEND_ZIP_URL: https://github.com/meteyou/mainsail/releases/latest/download/mainsail.zip
-  #   container_name: mainsail
-  #   ports:
-  #     - 8011:80
-  #   depends_on: 
-  #     - klipper
-  #     # - klipper_another_printer
-  #   links:
-  #     - klipper:klipper
-  #     # - klipper_another_printer:klipper_another_printer
-
-volumes: 
-  gcode_files:
-  moonraker_data:
-
+networks:
+  traefik:
+    external: true
