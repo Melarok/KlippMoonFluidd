@@ -142,7 +142,6 @@ COPY --chown=${USER}:${USER} --from=builder ${HOME}/klipper ${HOME}/klipper
 COPY --chown=${USER}:${USER} --from=builder ${KLIPPER_VENV_DIR} ${KLIPPER_VENV_DIR}
 COPY --chown=${USER}:${USER} --from=builder ${HOME}/moonraker ${HOME}/moonraker
 COPY --chown=${USER}:${USER} --from=builder ${MOONRAKER_VENV_DIR} ${MOONRAKER_VENV_DIR}
-COPY --chown=${USER}:${USER} config ${CONFIG_DIR}
 COPY --chown=${USER}:${USER} klipper/run_in_venv.sh /usr/local/bin/run_in_venv
 
 COPY klipper/supervisord/supervisord.conf /etc/supervisor/supervisord.conf

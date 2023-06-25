@@ -9,10 +9,10 @@ services:
       - SYS_NICE
     ports:
       #- <ip_of_your_raspi_here>:7125:7125
-      - 192.168.0.4:7125:7125
+      - 192.168.0.26:7125:7125
     volumes:
       - ./data:/home/klippy/printer_data
-    #devices:
+    devices:
       #- /dev/serial/by-id/<usb_id_of_your_printer_here>:/dev/printer
       - /dev/serial/by-id/usb-Klipper_lpc1768_1C400119018139AFC072075CC12000F5-if00:/dev/printer
     restart: unless-stopped

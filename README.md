@@ -29,6 +29,11 @@ Fully dockerized Klipper, Moonraker and Fluidd stack with optional reverse proxy
     - comment the "labels" and "networks" section of "fluidd"
     - comment the "networks" section at the end of the file
 
+### Customize your printer.cfg and moonraker.conf
+- The supplied .example files are tailored to my printer / setup
+- If you want to use my gcode-macros.cfg, test them carefully on your printer before using them
+
 ### Build the container and run it
 docker compose build
+
 docker compose up -d
