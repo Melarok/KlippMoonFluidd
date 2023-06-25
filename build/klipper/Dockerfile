@@ -28,7 +28,8 @@ RUN useradd -d ${HOME} -ms /bin/bash ${USER}; \
 	gpiod \
 	libopenjp2-7 \
 	liblmdb-dev \
-	libsodium-dev
+	libsodium-dev \
+	gcc-arm-none-eabi
 
 RUN sed -i -e 's/# en_GB.UTF-8 UTF-8/en_GB.UTF-8 UTF-8/' /etc/locale.gen; \
 	locale-gen; \
@@ -51,7 +52,8 @@ RUN git clone --single-branch --branch ${KLIPPER_BRANCH} https://github.com/Klip
 	${KLIPPER_VENV_DIR}/bin/python klippy/chelper/__init__.py; \
 	${KLIPPER_VENV_DIR}/bin/python -m compileall klippy
 
-COPY firmware/klipper-make.config ./.config
+COPY firmware/klipper-make.config ${HOME}/klipper/.config
+WORKDIR ${HOME}/klipper
 RUN make
 
 ### Moonraker setup ###

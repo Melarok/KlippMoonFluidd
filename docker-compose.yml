@@ -3,18 +3,18 @@ services:
     image: melarok/klippmoonfluidd
     container_name: klipper-moonraker
     build:
-      dockerfile: ./build/klipper/Dockerfile
-      context: ../
+      dockerfile: klipper/Dockerfile
+      context: build
     cap_add:
       - SYS_NICE
     ports:
       #- <ip_of_your_raspi_here>:7125:7125
-      - 192.168.0.4:7125:7125
+      - 192.168.0.26:7125:7125
     volumes:
       - ./data:/home/klippy/printer_data
-    devices:
+    #devices:
       #- /dev/serial/by-id/<usb_id_of_your_printer_here>:/dev/printer
-      - /dev/serial/by-id/usb-Klipper_lpc1768_1C400119018139AFC072075CC12000F5-if00:/dev/printer
+      #- /dev/serial/by-id/usb-Klipper_lpc1768_1C400119018139AFC072075CC12000F5-if00:/dev/printer
     restart: unless-stopped
 
 
@@ -27,18 +27,18 @@ services:
     environment:
       #TZ: "<your_timezone_here>"
       TZ: "Europe/Berlin"
-    #ports:
-    # - 8080:80
-    networks:
-      - traefik
-    labels:
+    ports:
+     - 8080:80
+    #networks:
+    #  - traefik
+    #labels:
       #- "traefik.http.routers.fluidd.entrypoints=<your_http_entrypoint_here>"
       #- "traefik.http.routers.fluidd.rule=Host(`<your_subdomain.domain.tld_here>`)"
-      - "traefik.enable=true"
-      - "traefik.http.routers.fluidd.entrypoints=web"
-      - "traefik.http.routers.fluidd.rule=Host(`print.pi`)"
+      #- "traefik.enable=true"
+      #- "traefik.http.routers.fluidd.entrypoints=web"
+      #- "traefik.http.routers.fluidd.rule=Host(`print.pi`)"
     restart: unless-stopped
 
-networks:
-  traefik:
-    external: true
+#networks:
+#  traefik:
+#    external: true
