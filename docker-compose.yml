@@ -1,6 +1,6 @@
 services:
   klipper-moonraker:
-    image: melarok/klippmoonfluidd
+    image: melarok/klippmoon
     container_name: klipper-moonraker
     build:
       dockerfile: klipper/Dockerfile
