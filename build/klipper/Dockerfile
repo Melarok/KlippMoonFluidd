@@ -1,4 +1,4 @@
-FROM python:3.11-bullseye as builder
+FROM python:3.11-bookworm as builder
 
 ARG DEBIAN_FRONTEND=noninteractive
 ARG KLIPPER_BRANCH="master"
@@ -13,28 +13,28 @@ ENV WHEELS=/wheels
 ENV PYTHONUNBUFFERED=1
 
 RUN useradd -d ${HOME} -ms /bin/bash ${USER}; \
-	apt-get update && apt-get install -y \
-	locales \
-	git \
-	sudo \
-	wget \
-	curl \
-	gzip \
-	tar \
-	libffi-dev \
-	build-essential \
-	libncurses-dev \
-	libusb-dev \
-	gpiod \
-	libopenjp2-7 \
-	liblmdb-dev \
-	libsodium-dev \
-	gcc-arm-none-eabi
+    apt-get update && apt-get install -y \
+    locales \
+    git \
+    sudo \
+    wget \
+    curl \
+    gzip \
+    tar \
+    libffi-dev \
+    build-essential \
+    libncurses-dev \
+    libusb-dev \
+    gpiod \
+    libopenjp2-7 \
+    liblmdb-dev \
+    libsodium-dev \
+    gcc-arm-none-eabi
 
 RUN sed -i -e 's/# en_GB.UTF-8 UTF-8/en_GB.UTF-8 UTF-8/' /etc/locale.gen; \
-	locale-gen; \
-	python -m pip install -U pip wheel && \
-	pip wheel --no-cache-dir -w ${WHEELS} supervisord-dependent-startup gpiod numpy matplotlib
+    locale-gen; \
+    python -m pip install -U pip wheel && \
+    pip wheel --no-cache-dir -w ${WHEELS} supervisord-dependent-startup gpiod numpy matplotlib
 
 ENV LC_ALL en_GB.UTF-8 
 ENV LANG en_GB.UTF-8  
@@ -45,12 +45,12 @@ USER ${USER}
 WORKDIR ${HOME}
 
 RUN git clone --single-branch --branch ${KLIPPER_BRANCH} https://github.com/Klipper3d/klipper.git klipper; \
-	python3 -m venv ${KLIPPER_VENV_DIR}; \
-	cd ${HOME}/klipper; \
-	${KLIPPER_VENV_DIR}/bin/pip install wheel && \
-	${KLIPPER_VENV_DIR}/bin/pip install --no-cache-dir -f ${WHEELS} -r scripts/klippy-requirements.txt; \
-	${KLIPPER_VENV_DIR}/bin/python klippy/chelper/__init__.py; \
-	${KLIPPER_VENV_DIR}/bin/python -m compileall klippy
+    python3 -m venv ${KLIPPER_VENV_DIR}; \
+    cd ${HOME}/klipper; \
+    ${KLIPPER_VENV_DIR}/bin/pip install wheel && \
+    ${KLIPPER_VENV_DIR}/bin/pip install --no-cache-dir -f ${WHEELS} -r scripts/klippy-requirements.txt; \
+    ${KLIPPER_VENV_DIR}/bin/python klippy/chelper/__init__.py; \
+    ${KLIPPER_VENV_DIR}/bin/python -m compileall klippy
 
 COPY firmware/klipper-make.config ${HOME}/klipper/.config
 WORKDIR ${HOME}/klipper
@@ -60,13 +60,13 @@ RUN make
 WORKDIR ${HOME}
 
 RUN git clone --single-branch --branch ${MOONRAKER_BRANCH} https://github.com/Arksine/moonraker.git moonraker; \
-	python3 -m venv ${MOONRAKER_VENV_DIR}; \
-	cd ${HOME}/moonraker; \
-	${MOONRAKER_VENV_DIR}/bin/pip install wheel gpiod && \
-	${MOONRAKER_VENV_DIR}/bin/pip install --no-cache-dir -f ${WHEELS} -r scripts/moonraker-requirements.txt; \
-	${MOONRAKER_VENV_DIR}/bin/python -m compileall moonraker
+    python3 -m venv ${MOONRAKER_VENV_DIR}; \
+    cd ${HOME}/moonraker; \
+    ${MOONRAKER_VENV_DIR}/bin/pip install wheel gpiod && \
+    ${MOONRAKER_VENV_DIR}/bin/pip install --no-cache-dir -f ${WHEELS} -r scripts/moonraker-requirements.txt; \
+    ${MOONRAKER_VENV_DIR}/bin/python -m compileall moonraker
 
-FROM python:3.11-slim-bullseye as image
+FROM python:3.11-slim-bookworm as image
 
 ARG DEBIAN_FRONTEND=noninteractive
 
@@ -81,13 +81,13 @@ RUN apt-get update && apt-get install -y \
     libopenjp2-7 \
     libsodium-dev \
     libssl-dev \
-    libtiff5 \
+    libtiff6 \
     locales \
     rsync \
     supervisor \
-    zlib1g-dev; \
-    sed -i -e 's/# en_GB.UTF-8 UTF-8/en_GB.UTF-8 UTF-8/' /etc/locale.gen && locale-gen; \
-    apt-get autoremove -y && apt-get clean -y && rm -rf /var/lib/apt/lists/*
+    zlib1g-dev && apt-get autoremove -y && apt-get clean -y && rm -rf /var/lib/apt/lists/*
+
+RUN sed -i -e 's/# en_GB.UTF-8 UTF-8/en_GB.UTF-8 UTF-8/' /etc/locale.gen && locale-gen
 
 ENV LC_ALL en_GB.UTF-8 
 ENV LANG en_GB.UTF-8  
