@@ -1,4 +1,4 @@
 data
-build/firmware/klipper-make.config
-build/config/moonraker.conf
-build/config/printer.cfg
+klipper-make.config
+moonraker.conf
+printer.cfg
