@@ -87,7 +87,7 @@ RUN apt-get update && apt-get install -y \
     supervisor \
     zlib1g-dev && apt-get autoremove -y && apt-get clean -y && rm -rf /var/lib/apt/lists/*
 
-RUN sed -i -e 's/# en_GB.UTF-8 UTF-8/en_GB.UTF-8 UTF-8/' /etc/locale.gen && locale-gen
+RUN sed -i -e "s/#en_GB.UTF-8 UTF-8/en_GB.UTF-8 UTF-8/g" /etc/locale.gen && locale-gen
 
 ENV LC_ALL en_GB.UTF-8 
 ENV LANG en_GB.UTF-8  
@@ -103,13 +103,7 @@ ENV MOONRAKER_VENV_DIR=${HOME}/moonraker-env
 ENV WHEELS=/wheels
 ENV PYTHONUNBUFFERED=1
 
-ARG DEVICE_GROUP=device
-ARG DEVICE_GID=987
-
-
 RUN useradd --user-group --no-log-init --shell /bin/false -m -d ${HOME} ${USER} && \
-    groupadd -g ${DEVICE_GID} ${DEVICE_GROUP} && \
-    usermod -a -G ${DEVICE_GROUP} ${USER} && \
     usermod -a -G tty ${USER} && \
     usermod -a -G dialout ${USER} && \
     usermod -a -G uucp ${USER} && \
