@@ -82,25 +82,8 @@ FROM python:3.11-slim-bookworm as image
 
 ARG DEBIAN_FRONTEND=noninteractive
 
-RUN apt-get update; apt-get install -y \
-    curl \
-    git \
-    gpiod \
-    iproute2 \
-    libcurl4-openssl-dev \
-    libjpeg-dev \
-    liblmdb-dev \
-    libopenjp2-7 \
-    libsodium-dev \
-    libssl-dev \
-    libtiff6 \
-    locales \
-    rsync \
-    supervisor \
-    zlib1g-dev; \
-    apt-get autoremove -y; \
-    apt-get clean -y; \
-    rm -rf /var/lib/apt/lists/*
+RUN apt-get update; apt-get install -y curl git gpiod iproute2 libcurl4-openssl-dev libjpeg-dev liblmdb-dev libopenjp2-7 libsodium-dev libssl-dev libtiff6 locales rsync supervisor zlib1g-dev
+RUN apt-get autoremove -y; apt-get clean -y; rm -rf /var/lib/apt/lists/*
 
 RUN sed -i 's/#en_GB.UTF-8 UTF-8/en_GB.UTF-8 UTF-8/g' /etc/locale.gen; locale-gen
 
