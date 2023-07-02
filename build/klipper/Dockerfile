@@ -17,23 +17,7 @@ ENV WHEELS=/wheels
 ENV PYTHONUNBUFFERED=1
 
 RUN useradd -d ${HOME} -ms /bin/bash ${USER}
-RUN "apt-get update; apt-get install -y \
-    locales \
-    git \
-    sudo \
-    wget \
-    curl \
-    gzip \
-    tar \
-    libffi-dev \
-    build-essential \
-    libncurses-dev \
-    libusb-dev \
-    gpiod \
-    libopenjp2-7 \
-    liblmdb-dev \
-    libsodium-dev \
-    gcc-arm-none-eabi"
+RUN "apt-get update; apt-get install -y locales git sudo wget curl gzip tar libffi-dev build-essential libncurses-dev libusb-dev gpiod libopenjp2-7 liblmdb-dev libsodium-dev gcc-arm-none-eabi"
 
 RUN "sed -i 's/# en_GB.UTF-8 UTF-8/en_GB.UTF-8 UTF-8/' /etc/locale.gen; locale-gen"
 RUN "python -m pip install -U pip wheel; pip wheel --no-cache-dir -w ${WHEELS} supervisord-dependent-startup gpiod numpy matplotlib"
