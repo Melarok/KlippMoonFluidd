@@ -99,7 +99,7 @@ RUN apt-get update && apt-get install -y \
     supervisor \
     zlib1g-dev && apt-get autoremove -y && apt-get clean -y && rm -rf /var/lib/apt/lists/*
 
-RUN sed -i -e "s/#en_GB.UTF-8 UTF-8/en_GB.UTF-8 UTF-8/g" /etc/locale.gen && locale-gen
+RUN sed -i -e "s/# en_GB.UTF-8 UTF-8/en_GB.UTF-8 UTF-8/g" /etc/locale.gen && locale-gen
 
 ENV LC_ALL en_GB.UTF-8 
 ENV LANG en_GB.UTF-8  
