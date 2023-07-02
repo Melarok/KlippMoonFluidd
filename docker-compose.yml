@@ -5,6 +5,8 @@ services:
     build:
       dockerfile: klipper/Dockerfile
       context: build
+    device_cgroup_rules:
+      - 'c 166:* rmw'
     cap_add:
       - SYS_NICE
     ports:
@@ -12,7 +14,8 @@ services:
       - 192.168.0.4:7125:7125
     volumes:
       - ./data:/home/klippy/printer_data
-      - /dev:/dev
+    devices:
+      - /dev/serial/by-id/usb-Klipper_lpc1768_1C400119018139AFC072075CC12000F5-if00:/dev/printer
     restart: unless-stopped
 
 
