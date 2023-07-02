@@ -35,7 +35,7 @@ RUN apt-get update; apt-get install -y \
     libsodium-dev \
     gcc-arm-none-eabi
 
-RUN sed -i 's/# en_GB.UTF-8 UTF-8/en_GB.UTF-8 UTF-8/' /etc/locale.gen; locale-gen
+RUN "sed -i 's/# en_GB.UTF-8 UTF-8/en_GB.UTF-8 UTF-8/' /etc/locale.gen; locale-gen"
 RUN python -m pip install -U pip wheel; pip wheel --no-cache-dir -w ${WHEELS} supervisord-dependent-startup gpiod numpy matplotlib
 
 ENV LC_ALL en_GB.UTF-8 
