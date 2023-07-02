@@ -115,6 +115,8 @@ ENV LANGUAGE en_GB:en
 
 ARG USER=klippy
 ARG HOME=/home/${USER}
+ARG DEVICE_GROUP=device
+ARG DEVICE_GID=987
 ENV DATA_DIR=${HOME}/printer_data
 ENV CONFIG_DIR=${DATA_DIR}/config
 ENV KLIPPER_VENV_DIR=${HOME}/klippy-env
@@ -124,6 +126,8 @@ ENV WHEELS=/wheels
 ENV PYTHONUNBUFFERED=1
 
 RUN useradd --user-group --no-log-init --shell /bin/false -m -d ${HOME} ${USER} && \
+    groupadd -g ${DEVICE_GID} ${DEVICE_GROUP} && \
+    usermod -a -G ${DEVICE_GROUP} ${USER} && \
     usermod -a -G tty ${USER} && \
     usermod -a -G dialout ${USER} && \
     usermod -a -G uucp ${USER} && \
