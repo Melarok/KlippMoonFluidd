@@ -1,10 +1,10 @@
 services:
   klipper-moonraker:
-    image: melarok/klippmoon
+    image: melarok/klippmoon:latest
     container_name: klipper-moonraker
     build:
-      dockerfile: build/main.Dockerfile
-      context: .
+      dockerfile: main.Dockerfile
+      context: "build"
     device_cgroup_rules:
       - 'c 166:* rmw'
     cap_add:
