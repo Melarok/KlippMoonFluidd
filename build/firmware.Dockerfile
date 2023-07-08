@@ -31,13 +31,14 @@ USER ${USER}
 WORKDIR ${HOME}
 
 ### Klipper setup ###
-RUN git clone --single-branch --branch ${KLIPPER_BRANCH} https://github.com/Klipper3d/klipper.git klipper; \
-	python3 -m venv ${KLIPPER_VENV_DIR}; \
-	${KLIPPER_VENV_DIR}/bin/pip install wheel; \
-	cd ${HOME}/klipper; \
-	${KLIPPER_VENV_DIR}/bin/pip install -r scripts/klippy-requirements.txt; \
-	${KLIPPER_VENV_DIR}/bin/python klippy/chelper/__init__.py
+RUN git clone --single-branch --branch ${KLIPPER_BRANCH} https://github.com/Klipper3d/klipper.git klipper && \
+	python3 -m venv ${KLIPPER_VENV_DIR} && \
+	${KLIPPER_VENV_DIR}/bin/pip install wheel
 
-RUN ${KLIPPER_VENV_DIR}/bin/python -m compileall klippy
+WORKDIR ${HOME}/klipper
+
+RUN	${KLIPPER_VENV_DIR}/bin/pip install -r scripts/klippy-requirements.txt && \
+	${KLIPPER_VENV_DIR}/bin/python klippy/chelper/__init__.py && \
+	${KLIPPER_VENV_DIR}/bin/python -m compileall klippy
 
 CMD ["bash"]
