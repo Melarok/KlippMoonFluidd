@@ -5,6 +5,7 @@ services:
     build:
       dockerfile: main.Dockerfile
       context: "build"
+      network: host
     device_cgroup_rules:
       - 'c 166:* rmw'
     cap_add:
