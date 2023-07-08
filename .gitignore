@@ -1,8 +1,6 @@
 # Exclude all files in the data directory except the folder structure, but include the example configs
-data/*/*
-data/*
-!moonraker.conf.example
-!printer.cfg.example
+data
+!*.example
 
 # Exclude the user generated files in the build directory
 build/firmware.bin
