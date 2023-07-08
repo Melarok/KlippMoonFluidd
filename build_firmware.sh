@@ -14,7 +14,10 @@ fi
 
 
 ### build the container
-docker buildx build --rm -f "$BASE"/firmware.Dockerfile -t klipper-firmware:latest "$BASE"
+
+docker network create klipper-tmp-net
+
+docker buildx build --rm --network klipper-tmp-net -f "$BASE"/firmware.Dockerfile -t klipper-firmware:latest "$BASE"
 
 ### if a config file from a previous build is present, use it it as a template for the next build
 if [[ -f ./klipper-make.config ]]; then
@@ -42,3 +45,4 @@ docker cp "$CONTAINER":/home/klippy/klipper/out/klipper.bin "$OUT"/firmware.bin
 ### cleanup
 docker rm "$CONTAINER"
 docker rmi klipper-firmware:latest
+docker network rm klipper-tmp-net
