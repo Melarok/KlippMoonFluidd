@@ -16,8 +16,8 @@ ARG MOONRAKER_VENV_DIR=${HOME}/moonraker-env
 ENV WHEELS=/wheels
 ENV PYTHONUNBUFFERED=1
 
-RUN useradd -d ${HOME} -ms /bin/bash ${USER}
-RUN apt-get update && \
+RUN useradd -d ${HOME} -ms /bin/bash ${USER} && \
+    apt-get update && \
     apt-get install -y \
     locales \
     git \
@@ -34,10 +34,10 @@ RUN apt-get update && \
     libopenjp2-7 \
     liblmdb-dev \
     libsodium-dev \
-    gcc-arm-none-eabi
+    gcc-arm-none-eabi && \
+    sed -i -e 's/# en_GB.UTF-8 UTF-8/en_GB.UTF-8 UTF-8/' /etc/locale.gen && \
+    locale-gen
 
-RUN sed -i -e 's/# en_GB.UTF-8 UTF-8/en_GB.UTF-8 UTF-8/' /etc/locale.gen
-RUN locale-gen
 RUN python -m pip install -U pip wheel && \
     pip wheel --no-cache-dir -w ${WHEELS} supervisord-dependent-startup gpiod numpy matplotlib
 
@@ -49,34 +49,32 @@ ENV LANGUAGE en_GB:en
 USER ${USER}
 WORKDIR ${HOME}
 
-RUN git clone --single-branch --branch ${KLIPPER_BRANCH} https://github.com/Klipper3d/klipper.git klipper
-
-RUN python3 -m venv ${KLIPPER_VENV_DIR}
+RUN git clone --single-branch --branch ${KLIPPER_BRANCH} https://github.com/Klipper3d/klipper.git klipper && \
+    python3 -m venv ${KLIPPER_VENV_DIR}
 
 WORKDIR ${HOME}/klipper
 
 RUN ${KLIPPER_VENV_DIR}/bin/pip install wheel && \
     ${KLIPPER_VENV_DIR}/bin/pip install --no-cache-dir -f ${WHEELS} -r scripts/klippy-requirements.txt
 
-RUN ${KLIPPER_VENV_DIR}/bin/python klippy/chelper/__init__.py
-RUN ${KLIPPER_VENV_DIR}/bin/python -m compileall klippy
+RUN ${KLIPPER_VENV_DIR}/bin/python klippy/chelper/__init__.py && \
+    ${KLIPPER_VENV_DIR}/bin/python -m compileall klippy
 
-COPY firmware/klipper-make.config ${HOME}/klipper/.config
+COPY klipper-make.config ${HOME}/klipper/.config
 WORKDIR ${HOME}/klipper
 RUN make
 
 ### Moonraker setup ###
 WORKDIR ${HOME}
 
-RUN git clone --single-branch --branch ${MOONRAKER_BRANCH} https://github.com/Arksine/moonraker.git moonraker
-
-RUN python3 -m venv ${MOONRAKER_VENV_DIR}
-
+RUN git clone --single-branch --branch ${MOONRAKER_BRANCH} https://github.com/Arksine/moonraker.git moonraker && \
+    python3 -m venv ${MOONRAKER_VENV_DIR}
 
 WORKDIR ${HOME}/moonraker
 
 RUN ${MOONRAKER_VENV_DIR}/bin/pip install wheel gpiod && \
     ${MOONRAKER_VENV_DIR}/bin/pip install --no-cache-dir -f ${WHEELS} -r scripts/moonraker-requirements.txt
+
 RUN ${MOONRAKER_VENV_DIR}/bin/python -m compileall moonraker
 
 #########
@@ -160,8 +158,8 @@ COPY --chown=${USER}:${USER} --from=builder ${HOME}/klipper ${HOME}/klipper
 COPY --chown=${USER}:${USER} --from=builder ${KLIPPER_VENV_DIR} ${KLIPPER_VENV_DIR}
 COPY --chown=${USER}:${USER} --from=builder ${HOME}/moonraker ${HOME}/moonraker
 COPY --chown=${USER}:${USER} --from=builder ${MOONRAKER_VENV_DIR} ${MOONRAKER_VENV_DIR}
-COPY --chown=${USER}:${USER} klipper/run_in_venv.sh /usr/local/bin/run_in_venv
+COPY --chown=${USER}:${USER} run_in_venv.sh /usr/local/bin/run_in_venv
 
-COPY klipper/supervisord/supervisord.conf /etc/supervisor/supervisord.conf
-COPY klipper/supervisord/*.ini /etc/supervisor/conf.d/
+COPY supervisord/supervisord.conf /etc/supervisor/supervisord.conf
+COPY supervisord/*.ini /etc/supervisor/conf.d/
 CMD ["supervisord", "-c", "/etc/supervisor/supervisord.conf"]

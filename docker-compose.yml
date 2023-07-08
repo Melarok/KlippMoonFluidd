@@ -3,8 +3,8 @@ services:
     image: melarok/klippmoon
     container_name: klipper-moonraker
     build:
-      dockerfile: klipper/Dockerfile
-      context: build
+      dockerfile: build/main.Dockerfile
+      context: .
     device_cgroup_rules:
       - 'c 166:* rmw'
     cap_add:
@@ -15,6 +15,7 @@ services:
     volumes:
       - ./data:/home/klippy/printer_data
     devices:
+      #- /dev/serial/by-id/<your_printers_id_here>:/dev/printer
       - /dev/serial/by-id/usb-Klipper_lpc1768_1C400119018139AFC072075CC12000F5-if00:/dev/printer
     restart: unless-stopped
 

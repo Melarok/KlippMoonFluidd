@@ -1,3 +1,8 @@
-klipper-make.config
-moonraker.conf
-printer.cfg
+# Exclude all files in the data directory except the folder structure, but include the example configs
+data/**/*
+!moonraker.conf.example
+!printer.cfg.example
+
+# Exclude the user generated files in the build directory
+build/firmware.bin
+build/klipper-make.config

@@ -25,8 +25,7 @@ enable_system_updates: False
 [machine]
 validate_service: False
 validate_config: True
-provider: supervisord_cli
-supervisord_config_path: /etc/supervisor/conf.d/supervisord.conf
+provider: none
 
 [data_store]
 temperature_store_size: 600
