@@ -1,5 +1,6 @@
 # Exclude all files in the data directory except the folder structure, but include the example configs
-data/**/*
+data/*/*
+data/*
 !moonraker.conf.example
 !printer.cfg.example
 
