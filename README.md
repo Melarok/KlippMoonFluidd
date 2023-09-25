@@ -50,3 +50,4 @@ ACTION=="add", KERNEL=="ttyUSB[0-9]", SUBSYSTEM=="tty", ENV{ID_VENDOR_ID}=="<You
 
 ### Build and run the main container
 docker compose build --pull
+docker compose up -d
