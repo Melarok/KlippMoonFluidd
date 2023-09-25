@@ -2,7 +2,7 @@
 # BUILDER #
 ###########
 
-FROM python:3.11-bookworm as builder
+FROM python:3.10-bookworm as builder
 
 ARG DEBIAN_FRONTEND=noninteractive
 ARG KLIPPER_BRANCH="master"
@@ -81,7 +81,7 @@ RUN ${MOONRAKER_VENV_DIR}/bin/python -m compileall moonraker
 # IMAGE #
 #########
 
-FROM python:3.11-slim-bookworm as image
+FROM python:3.10-slim-bookworm as image
 
 ARG DEBIAN_FRONTEND=noninteractive
 
