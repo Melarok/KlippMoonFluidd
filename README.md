@@ -16,8 +16,8 @@ Fully dockerized Klipper, Moonraker and Fluidd stack with optional reverse proxy
 - Paste the following two lines and replace <usename> with your username
 
 ```
-    KERNEL=="ttyUSB[0-9]*",GROUP+="<username>"
-    KERNEL=="ttyACM[0-9]*",GROUP+="<username>"
+KERNEL=="ttyUSB[0-9]*",GROUP+="<username>"
+KERNEL=="ttyACM[0-9]*",GROUP+="<username>"
 ```
 
 ### Optional: set up udev rules to restart the container on powering it on (same as plugging it in)
@@ -25,8 +25,8 @@ Add the following lines to the /etc/udev/rules.d/99-KlippMoonFluidd-serial.rules
 - ENV{ID_VENDOR_ID} and ENV{ID_MODEL_ID} can be obtained by runing "lsusb"
 
 ```
-    ACTION=="add", KERNEL=="ttyACM[0-9]", SUBSYSTEM=="tty", ENV{ID_VENDOR_ID}=="<YourValueHere>", ENV{ID_MODEL_ID}=="<YourValueHere>", RUN+="<PathToGitRepo>/restart_on_plug-in.sh"
-    ACTION=="add", KERNEL=="ttyUSB[0-9]", SUBSYSTEM=="tty", ENV{ID_VENDOR_ID}=="<YourValueHere>", ENV{ID_MODEL_ID}=="<YourValueHere>", RUN+="<PathToGitRepo>/restart_on_plug-in.sh"
+ACTION=="add", KERNEL=="ttyACM[0-9]", SUBSYSTEM=="tty", ENV{ID_VENDOR_ID}=="<YourValueHere>", ENV{ID_MODEL_ID}=="<YourValueHere>", RUN+="<PathToGitRepo>/restart_on_plug-in.sh"
+ACTION=="add", KERNEL=="ttyUSB[0-9]", SUBSYSTEM=="tty", ENV{ID_VENDOR_ID}=="<YourValueHere>", ENV{ID_MODEL_ID}=="<YourValueHere>", RUN+="<PathToGitRepo>/restart_on_plug-in.sh"
 ```
 
 ### Modify the docker-compose.yml according to your needs
