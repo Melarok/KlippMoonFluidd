@@ -1,5 +1,6 @@
 services:
   klipper-moonraker:
+    # you'll probably want to comment the "image:" line and build your own container, unless you know what you're doing (see https://hub.docker.com/r/melarok/klipp-moon)
     image: melarok/klipp-moon:latest
     container_name: klipper-moonraker
     build:
