@@ -2,7 +2,7 @@
 # BUILDER #
 ###########
 
-FROM python:3.10-bookworm as builder
+FROM --platform=linux/arm64 python:3.12-bookworm as builder
 
 ARG DEBIAN_FRONTEND=noninteractive
 ARG KLIPPER_BRANCH="master"
@@ -35,8 +35,7 @@ RUN useradd -d ${HOME} -ms /bin/bash ${USER} && \
     liblmdb-dev \
     libsodium-dev \
     gcc-arm-none-eabi && \
-    sed -i -e 's/# en_GB.UTF-8 UTF-8/en_GB.UTF-8 UTF-8/' /etc/locale.gen && \
-    locale-gen
+    sed -i -e 's/# en_GB.UTF-8 UTF-8/en_GB.UTF-8 UTF-8/' /etc/locale.gen && locale-gen
 
 RUN python -m pip install -U pip wheel && \
     pip wheel --no-cache-dir -w ${WHEELS} supervisord-dependent-startup gpiod numpy matplotlib
@@ -53,6 +52,8 @@ RUN git clone --single-branch --branch ${KLIPPER_BRANCH} https://github.com/Klip
     python3 -m venv ${KLIPPER_VENV_DIR}
 
 WORKDIR ${HOME}/klipper
+
+RUN sed -i 's/greenlet==.\+/greenlet==3.0.1/' scripts/klippy-requirements.txt
 
 RUN ${KLIPPER_VENV_DIR}/bin/pip install wheel && \
     ${KLIPPER_VENV_DIR}/bin/pip install --no-cache-dir -f ${WHEELS} -r scripts/klippy-requirements.txt
@@ -81,11 +82,14 @@ RUN ${MOONRAKER_VENV_DIR}/bin/python -m compileall moonraker
 # IMAGE #
 #########
 
-FROM python:3.10-slim-bookworm as image
+FROM --platform=linux/arm64 python:3.12-slim-bookworm as image
 
 ARG DEBIAN_FRONTEND=noninteractive
 
-RUN apt-get update && apt-get install -y \
+RUN apt-get update && \
+    apt-get upgrade -y && \
+    apt install -y \
+    sed \
     curl \
     git \
     gpiod \

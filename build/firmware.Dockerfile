@@ -1,4 +1,4 @@
-FROM python:3.11-bookworm
+FROM python:3.12-bookworm
 
 ARG DEBIAN_FRONTEND=noninteractive
 ARG KLIPPER_BRANCH="master"
@@ -19,8 +19,8 @@ RUN useradd -d ${HOME} -ms /bin/bash ${USER} && \
 	build-essential \
 	gcc-arm-none-eabi
 
-RUN sed -i -e 's/# en_GB.UTF-8 UTF-8/en_GB.UTF-8 UTF-8/' /etc/locale.gen && \
-	locale-gen && \
+RUN sed -i 's/greenlet==.\+/greenlet==3.0.1/' scripts/klippy-requirements.txt
+RUN sed -i -e 's/# en_GB.UTF-8 UTF-8/en_GB.UTF-8 UTF-8/' /etc/locale.gen && locale-gen; \
 	python -m pip install -U pip wheel
 
 ENV LC_ALL en_GB.UTF-8 
