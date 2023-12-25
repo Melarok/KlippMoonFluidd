@@ -1,8 +1,8 @@
-###########
-# BUILDER #
-###########
+######################
+# Base builder image #
+######################
 
-FROM --platform=linux/arm64 python:3.12-bookworm as builder
+FROM --platform=linux/arm64 python:3.12-bookworm AS builder
 
 ARG DEBIAN_FRONTEND=noninteractive
 ARG KLIPPER_BRANCH="master"
@@ -10,10 +10,7 @@ ARG MOONRAKER_BRANCH="master"
 
 ARG USER=klippy
 ARG HOME=/home/${USER}
-ARG KLIPPER_VENV_DIR=${HOME}/klippy-env
-ARG MOONRAKER_VENV_DIR=${HOME}/moonraker-env
-
-ENV WHEELS=/wheels
+ARG WHEELS=/wheels
 ENV PYTHONUNBUFFERED=1
 
 RUN useradd -d ${HOME} -ms /bin/bash ${USER} && \
@@ -45,6 +42,15 @@ ENV LANG en_GB.UTF-8
 ENV LANGUAGE en_GB:en   
 
 ### Klipper setup ###
+FROM builder AS klipper
+
+ARG DEBIAN_FRONTEND=noninteractive
+ARG USER=klippy
+ARG HOME=/home/${USER}
+ARG WHEELS=/wheels
+ARG KLIPPER_BRANCH="master"
+ARG KLIPPER_VENV_DIR=${HOME}/klippy-env
+
 USER ${USER}
 WORKDIR ${HOME}
 
@@ -66,6 +72,16 @@ WORKDIR ${HOME}/klipper
 RUN make
 
 ### Moonraker setup ###
+FROM builder AS moonraker
+
+ARG DEBIAN_FRONTEND=noninteractive
+ARG USER=klippy
+ARG HOME=/home/${USER}
+ARG WHEELS=/wheels
+ARG MOONRAKER_BRANCH="master"
+ARG MOONRAKER_VENV_DIR=${HOME}/moonraker-env
+
+USER ${USER}
 WORKDIR ${HOME}
 
 RUN git clone --single-branch --branch ${MOONRAKER_BRANCH} https://github.com/Arksine/moonraker.git moonraker && \
@@ -78,16 +94,18 @@ RUN ${MOONRAKER_VENV_DIR}/bin/pip install wheel gpiod && \
 
 RUN ${MOONRAKER_VENV_DIR}/bin/python -m compileall moonraker
 
-#########
-# IMAGE #
-#########
 
-FROM --platform=linux/arm64 python:3.12-slim-bookworm as image
+
+###############
+# Final image #
+###############
+
+FROM --platform=linux/arm64 python:3.12-slim-bookworm AS image
 
 ARG DEBIAN_FRONTEND=noninteractive
 
 RUN apt-get update && \
-    apt-get upgrade -y && \
+    #apt-get upgrade -y && \
     apt install -y \
     sed \
     curl \
@@ -140,11 +158,12 @@ RUN useradd --user-group --no-log-init --shell /bin/false -m -d ${HOME} ${USER} 
     mkdir -p /var/log/klipper && \
     chown -R ${USER}:${USER} /var/log/klipper ${HOME}
 
-COPY --chown=${USER}:${USER} --from=builder ${WHEELS} ${WHEELS}
+COPY --chown=${USER}:${USER} --from=klipper ${WHEELS} ${WHEELS}
+COPY --chown=${USER}:${USER} --from=moonraker ${WHEELS} ${WHEELS}
 
 RUN pip install --no-index -f ${WHEELS} supervisord-dependent-startup gpiod numpy matplotlib && \
     mkdir -p /usr/lib/python3 && \
-    ln -s /usr/local/lib/python3.11/site-packages /usr/lib/python3/dist-packages && \
+    ln -s /usr/local/lib/python3.12/site-packages /usr/lib/python3/dist-packages && \
     rm -Rf ${WHEELS}
 
 USER ${USER}
@@ -156,12 +175,12 @@ EXPOSE 7125
 
 USER root
 
-COPY --chown=${USER}:${USER} --from=builder ${HOME}/klipper/out/klipper.elf /usr/local/bin/klipper_mcu
-COPY --chown=${USER}:${USER} --from=builder ${HOME}/klipper/out/klipper.bin ${DATA_DIR}/firmware.bin
-COPY --chown=${USER}:${USER} --from=builder ${HOME}/klipper ${HOME}/klipper
-COPY --chown=${USER}:${USER} --from=builder ${KLIPPER_VENV_DIR} ${KLIPPER_VENV_DIR}
-COPY --chown=${USER}:${USER} --from=builder ${HOME}/moonraker ${HOME}/moonraker
-COPY --chown=${USER}:${USER} --from=builder ${MOONRAKER_VENV_DIR} ${MOONRAKER_VENV_DIR}
+COPY --chown=${USER}:${USER} --from=klipper ${HOME}/klipper/out/klipper.elf /usr/local/bin/klipper_mcu
+COPY --chown=${USER}:${USER} --from=klipper ${HOME}/klipper/out/klipper.bin ${DATA_DIR}/firmware.bin
+COPY --chown=${USER}:${USER} --from=klipper ${HOME}/klipper/klippy ${HOME}/klippy
+COPY --chown=${USER}:${USER} --from=klipper ${KLIPPER_VENV_DIR} ${KLIPPER_VENV_DIR}
+COPY --chown=${USER}:${USER} --from=moonraker ${HOME}/moonraker ${HOME}/moonraker
+COPY --chown=${USER}:${USER} --from=moonraker ${MOONRAKER_VENV_DIR} ${MOONRAKER_VENV_DIR}
 COPY --chown=${USER}:${USER} run_in_venv.sh /usr/local/bin/run_in_venv
 
 COPY supervisord/supervisord.conf /etc/supervisor/supervisord.conf

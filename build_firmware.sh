@@ -13,12 +13,11 @@ else
 fi
 
 ### build the container
-docker buildx build --rm --network host -f "$BASE"/firmware.Dockerfile -t klipper-firmware:latest "$BASE"
+docker buildx build --load -f "$BASE"/firmware.Dockerfile -t klipper-firmware:latest "$BASE"
 
 ### if a config file from a previous build is present, use it it as a template for the next build
 if [[ -f ./klipper-make.config ]]; then
-    CONTAINER=$(docker run -d -v "$BASE"/klipper-make.config:/home/klippy/klipper/.config \
-                                 klipper-firmware:latest sleep infinity)
+    CONTAINER=$(docker run -d -v "$BASE"/klipper-make.config:/home/klippy/klipper/.config klipper-firmware:latest sleep infinity)
 else
     CONTAINER=$(docker run -d klipper-firmware:latest sleep infinity)
 fi
