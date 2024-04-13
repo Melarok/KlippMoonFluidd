@@ -43,7 +43,7 @@ ACTION=="add", KERNEL=="ttyUSB[0-9]", SUBSYSTEM=="tty", ENV{ID_VENDOR_ID}=="<You
 - If you want to use my gcode-macros.cfg, test them carefully on your printer before using them
 
 
-### Check the gecode-macros.cfg.example!!!
+### Check the gcode-macros.cfg.example!!!
 - The supplied gcode-macros.cfg.example contains macros I collected somewhere, so I can't guarantee that they'll work for your printer!
 - Assume they'll destroy your printer, so test them carefully before using them
 
